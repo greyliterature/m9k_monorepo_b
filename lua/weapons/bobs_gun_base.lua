@@ -185,6 +185,8 @@ end
 function SWEP:Deploy()
     self:SetIronsights( false )
     self:SetReloading ( false )
+    self.IronSightsPos = vector_origin
+    self.IronSightsAng = angle_zero
     self.DrawCrosshair = self.OrigCrossHair
     self:SetHoldType( self.HoldType )
 
