@@ -183,7 +183,9 @@ function SWEP:Equip()
 end
 
 function SWEP:Deploy()
+    if self:GetReloading() == false then self.SwitchedWeapons = nil end
     self:SetIronsights( false )
+    self:SetReloading ( false )
     self.DrawCrosshair = self.OrigCrossHair
     self:SetHoldType( self.HoldType )
 
@@ -211,7 +213,7 @@ end
 
 function SWEP:Holster()
     local owner = entity_GetOwner( self )
-
+    self.SwitchedWeapons = true
     if CLIENT and IsValid( owner ) and not owner:IsNPC() then
         local vm = owner:GetViewModel()
         if IsValid( vm ) then
