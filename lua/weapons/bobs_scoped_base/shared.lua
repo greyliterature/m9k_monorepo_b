@@ -232,12 +232,22 @@ function SWEP:Reload()
     else
         waitdammit = owner:GetViewModel():SequenceDuration()
     end
-    timer.Simple( waitdammit + .1, function()
-        if not IsValid( self ) or not IsValid( owner ) then return end
-        self:SetReloading( false )
 
-        if self.SwitchedWeapons then return end
-        self:ReloadClip()
+    timer.Create( "m9k_ReloadTimer" .. self:GetClass() .. owner:UserID(), waitdammit + .1, 1, function()
+        if not IsValid( self ) or not IsValid( owner ) then return end
+        if owner:GetActiveWeapon() ~= self then return end
+        if self:GetReloading() == true then
+            self:ReloadClip()
+            self:SetReloading( false )
+            if owner:KeyDown( IN_ATTACK2 ) then
+                owner:SetFOV( 75 / self.Secondary.ScopeZoom, 0.15 )
+                self.IronSightsPos = self.SightsPos -- Bring it up
+                self.IronSightsAng = self.SightsAng -- Bring it up
+                self.DrawCrosshair = false
+                self:SetIronsights( true )
+                self:SetDrawViewmodel( false )
+            end
+        end
 
         if self:IsRunning() and not self.CanShootWhileRunning then
             if self:GetNextPrimaryFire() <= ( CurTime() + 0.3 ) then
@@ -250,15 +260,6 @@ function SWEP:Reload()
             owner:SetFOV( 0, 0.2 )
 
             return
-        end
-
-        if owner:KeyDown( IN_ATTACK2 ) then
-            owner:SetFOV( 75 / self.Secondary.ScopeZoom, 0.15 )
-            self.IronSightsPos = self.SightsPos -- Bring it up
-            self.IronSightsAng = self.SightsAng -- Bring it up
-            self.DrawCrosshair = false
-            self:SetIronsights( true )
-            self:SetDrawViewmodel( false )
         end
     end )
 end
